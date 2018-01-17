@@ -1,13 +1,17 @@
-"""
-	test and learn heroku neo4j
-"""
 
-import os
+"""
+	test and learn heroku neo4
+"""
+import configparser
+
 from neo4j.v1 import GraphDatabase, basic_auth
 
-graphenedb_url = os.environ.get("GRAPHENEDB_BOLT_URL")
-graphenedb_user = os.environ.get("GRAPHENEDB_BOLT_USER")
-graphenedb_pass = os.environ.get("GRAPHENEDB_BOLT_PASSWORD")
+config = configparser.ConfigParser()
+config.read('../.config/config')
+pw = config.get("configuration", "neo4jpw").strip("'")  # cp adds extra quotes
+graphenedb_url = 'bolt://localhost:7687'
+graphenedb_user = 'neo4j'
+graphenedb_pass = pw
 
 driver = GraphDatabase.driver(graphenedb_url, auth=basic_auth(graphenedb_user, graphenedb_pass))
 
