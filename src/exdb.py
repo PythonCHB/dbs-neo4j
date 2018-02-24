@@ -52,7 +52,7 @@ def main():
         print(record["name"])
     session.close()
 
-    logger.info('Note - this need some excpetion handling!')
+    logger.info('Note - this need some exception handling!')
 
 if __name__ == '__main__':
     main()
