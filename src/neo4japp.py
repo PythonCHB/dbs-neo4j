@@ -1,7 +1,7 @@
 
 """
-    test and learn neo4
-    Note the imports - refer to the Neo4j introductory text.
+    simple neo4j app
+    Illustrate relationships
 
 """
 import configparser
@@ -11,31 +11,20 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-logger.info('Basic access to Neo4j instance')
-logger.info('First get the password credential from the configparser secrets file')
-
+logger.info('Simple app to illustrate Neo4j and relationships')
 config = configparser.ConfigParser()
 config.read('../.config/config')
-
-logger.info('Notice how the string matches the contents of the file')
-
 pw = config.get("configuration", "neo4jpw").strip("'")  # configparser adds extra quotes so strip them
-
-logger.info('Now we set the url that we obtained from graphenedb.com')
-
 graphenedb_url = 'bolt://hobby-opmhmhgpkdehgbkejbochpal.dbs.graphenedb.com:24786'
-
-logger.info('Here I hard coded the username. I should read that from the file too in a real app')
 graphenedb_user = 'andy'
 graphenedb_pass = pw
-
-logger.info('And now, get the Neo4j database')
-
 driver = GraphDatabase.driver(graphenedb_url, auth=basic_auth(graphenedb_user, graphenedb_pass))
 
 
 def main():
-    logger.info('Establish a session with the database')
+    """
+        Create some related records
+    """
     session = driver.session()
 
     logger.info('Here we add a Person who has the name Bob. Note: care with quotes!')
@@ -50,9 +39,6 @@ def main():
 
     for record in result:
         print(record["name"])
-
-    logger.info('Cleanup')
-    session.run("MATCH (n:Person) DETACH DELETE n")
 
     session.close()
 
