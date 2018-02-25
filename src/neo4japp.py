@@ -4,9 +4,10 @@
     Illustrate relationships
 
 """
+import logging
 import configparser
 from neo4j.v1 import GraphDatabase, basic_auth
-import logging
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -20,10 +21,8 @@ graphenedb_user = 'andy'
 graphenedb_pass = pw
 driver = GraphDatabase.driver(graphenedb_url, auth=basic_auth(graphenedb_user, graphenedb_pass))
 
-
-def main():
     """
-        Create some related records
+        Create some rel
     """
     session = driver.session()
 

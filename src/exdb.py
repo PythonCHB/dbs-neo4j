@@ -35,6 +35,9 @@ driver = GraphDatabase.driver(graphenedb_url, auth=basic_auth(graphenedb_user, g
 
 
 def main():
+    """
+        Sample neo4j program
+    """
     logger.info('Establish a session with the database')
     session = driver.session()
 
