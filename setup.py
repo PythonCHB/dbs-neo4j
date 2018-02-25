@@ -10,11 +10,11 @@ setup(
     author_email='akmiles@icloud.com',
     url='https://github.com/milesak60/dbs-neo4j',
     setup_requires=[
-#        'pytest-runner',
+        'pytest-runner',
         'pytest-pylint',
     ],
     tests_require=[
-#        'pytest',
+        'pytest',
         'pylint',
     ],
 )
