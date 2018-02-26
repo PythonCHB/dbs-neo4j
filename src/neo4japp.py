@@ -1,28 +1,53 @@
+#!/usr/bin/env python
 
 """
-    simple neo4j app
-    Illustrate relationships
+Simple neo4j app
+
+To illustrate relationships
+
+This requires the neo4j
+
+This assumes that you have a configuration file in a dir relative to this one:
+
+.config/config
+
+With the follwoing configuration in it:
+
+[configuration]
+
+neo4juser = your_graphenedb_username
+neo4jpw = your_graphenedb_password
 
 """
+
 import logging
-import configparser
+from configparser import ConfigParser
 from neo4j.v1 import GraphDatabase, basic_auth
-
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 logger.info('Simple app to illustrate Neo4j and relationships')
-config = configparser.ConfigParser()
-config.read('../.config/config')
-pw = config.get("configuration", "neo4jpw").strip("'")  # configparser adds extra quotes so strip them
-graphenedb_url = 'bolt://hobby-opmhmhgpkdehgbkejbochpal.dbs.graphenedb.com:24786'
-graphenedb_user = 'andy'
-graphenedb_pass = pw
-driver = GraphDatabase.driver(graphenedb_url, auth=basic_auth(graphenedb_user, graphenedb_pass))
 
+config = ConfigParser()
+config.read('../.config/config')
+
+username = config["configuration"]["neo4juser"]
+password = config["configuration"]["neo4jpw"]
+
+graphenedb_url = 'bolt://hobby-opmhmhgpkdehgbkejbochpal.dbs.graphenedb.com:24786'
+graphenedb_user = username
+graphenedb_pass = password
+
+print("Using:", username, password)
+
+driver = GraphDatabase.driver(graphenedb_url,
+                              auth=basic_auth(graphenedb_user, graphenedb_pass))
+
+
+def main():
     """
-        Create some rel
+    Create some rel
     """
     session = driver.session()
 
