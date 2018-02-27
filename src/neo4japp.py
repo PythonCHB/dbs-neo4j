@@ -82,6 +82,7 @@ def test1(driver):
     with driver.session() as session:
         logger.info('Here we add a Person who has the name Bob. Note: care with quotes!')
 
+        # The stuff in quotes is the Cypher query language
         session.run("CREATE (n:Person {name:'Bob'})")
 
         logger.info('Now lets see if we can find Bob')
@@ -97,8 +98,128 @@ def test1(driver):
 
         logger.info('Note - this needs some exception handling!')
 
+def test2(driver):
+    """
+    Add a few people, some with a little more info
+    """
+    with driver.session() as session:
+
+        logger.info('Adding a couple Person nodes')
+        session.run("CREATE (n:Person {first_name:'Bob', last_name: 'Jones'})")
+        session.run("CREATE (n:Person {first_name:'Nancy', last_name: 'Cooper'})")
+
+        # find all the Person nodes:
+        logger.info('finding all Person node')
+        result = session.run("MATCH (n:Person) RETURN n")
+
+        # result is an iterable of records
+        # you can look at a record without "consuming" it.
+        rec = result.peek()
+
+        # a record is one or more nodes,
+        # in an ordered mapping, you can get it by name or index:
+        print(rec[0])
+        print(rec['n']) # the n from the query above
+        node = rec[0]
+
+        # each node as a unique id:
+        logger.info('each node as a unique id')
+        print(node.id)
+
+        # A node is dict-like with the properties stored:
+        logger.info('and you can access its properties')
+        print("the first person is:")
+        print(node['first_name'], node['last_name'])
+
+        # iterating through all the Person nodes:
+        logger.info('Looping through all the Person nodes')
+        for rec in result:
+            # each record object
+            node = rec[0]
+            print(node['first_name'], node['last_name'])
+
+
+def test3(driver):
+    """
+    Add a few people, some with a little more info
+    """
+    with driver.session() as session:
+
+        logger.info('Adding a few Person nodes')
+        session.run("CREATE (n:Person {first_name:'Bob', last_name: 'Jones'})")
+        session.run("CREATE (n:Person {first_name:'Nancy', last_name: 'Cooper'})")
+        session.run("CREATE (n:Person {first_name:'Alice', last_name: 'Cooper'})")
+        session.run("CREATE (n:Person {first_name:'Fred', last_name: 'Barnes'})")
+
+        logger.info('Create a relationship')
+        # Bob Jones likes Alice Cooper
+
+        result = session.run("MATCH (person1:Person {first_name:'Bob', last_name:'Jones'}) "
+                             "CREATE (person1)-[like:LIKE]->(person2:Person {first_name:'Alice', last_name:'Cooper'}) "
+                             "RETURN like"
+                             )
+        logger.info('This returns a Relationship object')
+        rel = result.peek()[0]
+        print("relationship:", rel)
+        print("relationship's type:", rel.type)
+        print("it connects nodes:", rel.start, "and", rel.end)
+            # for name, node in rec.items():
+            #     print("got node:", name)
+            #     print(type(node))
+            #     print(node['first_name'], node['last_name'])
+
+        print("can we find Bob's friend?")
+        result = session.run("MATCH (bob {first_name:'Bob', last_name:'Jones'})"
+                             "-[:LIKE]->(bobFriends)"
+                             "RETURN bobFriends")
+        print("Bob's friends are:")
+        for rec in result:
+            for f in rec.values():
+                print(f['first_name'], f['last_name'])
+
+
+def test4(driver):
+    """
+    Add a few people, some with a little more info
+    """
+    with driver.session() as session:
+
+        logger.info('Adding a few Person nodes')
+        session.run("CREATE (n:Person {first_name:'Bob', last_name: 'Jones'})")
+        session.run("CREATE (n:Person {first_name:'Nancy', last_name: 'Cooper'})")
+        session.run("CREATE (n:Person {first_name:'Alice', last_name: 'Cooper'})")
+        session.run("CREATE (n:Person {first_name:'Fred', last_name: 'Barnes'})")
+
+        logger.info('Create some relationship')
+        # Bob Jones likes Alice Cooper and Fred Barnes
+
+        for first, last in [("Alice", "Cooper"), ("Fred", "Barnes")]:
+            cypher = """
+            MATCH (p1:Person {first_name:'Bob', last_name:'Jones'})
+            CREATE (p1)-[like:LIKE]->(p2:Person {first_name:'%s', last_name:'%s'})
+            RETURN p1
+            """ % (first, last)
+            session.run(cypher)
+
+        print("can we find all of Bob's friends?")
+        result = session.run("MATCH (bob {first_name:'Bob', last_name:'Jones'})"
+                             "-[:LIKE]->(bobFriends)"
+                             "RETURN bobFriends")
+        print("Bob's friends are:")
+        for rec in result:
+            for f in rec.values():
+                print(f['first_name'], f['last_name'])
+
+
 
 if __name__ == '__main__':
     driver = setup_db()
-    test1(driver)
+    clear_all(driver)
+    # test1(driver)
+    # test2(driver)
+    # test3(driver)
+    test4(driver)
+
+
+
 
